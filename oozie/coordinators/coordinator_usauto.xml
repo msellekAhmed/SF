@@ -1,0 +1,62 @@
+<coordinator-app name="COORDINATOR SEGMENT US AUTO" frequency="0 5 * * MON-FRI" start="${start}" end="${end}"
+                 timezone="Europe/Paris" xmlns="uri:oozie:coordinator:0.4">
+
+    <!-- Coordinator Control -->
+    <controls>
+        <timeout>-1</timeout>
+        <concurrency>1</concurrency>
+        <execution>FIFO</execution>
+    </controls>
+
+    <datasets>
+
+        <dataset name="BDI" frequency="${coord:months(1)}" initial-instance="${initialInstance}"
+                 timezone="Europe/Paris">
+            <uri-template>${MAVEN_BDI_DB_DIR}/_FLAG/${YEAR}${MONTH}</uri-template>
+            <done-flag>_SUCCESS</done-flag>
+        </dataset>
+
+        <dataset name="us_auto" frequency="${coord:days(1)}" initial-instance="${initialInstance}"
+                 timezone="Europe/Paris">
+            <uri-template>/lake/cdn/an218_pre/${YEAR}${MONTH}${DAY}</uri-template>
+            <done-flag>_SUCCESS</done-flag>
+        </dataset>
+
+
+    </datasets>
+
+
+    <!-- Waiting for input : on veut la partition de la veille -->
+
+    <input-events>
+
+        <data-in name="input_bdi" dataset="BDI">
+            <instance>${coord:current(-2)}</instance>
+        </data-in>
+        <data-in name="input_auto" dataset="us_auto">
+            <instance>${coord:current(0)}</instance>
+        </data-in>
+
+    </input-events>
+
+    <!-- WorkFlow Definition and sending param : calcul du paramètre -->
+    <action>
+        <workflow>
+            <app-path>${MAVEN_OOZIE_DIR}/workflows/workflow_usauto.xml</app-path>
+            <configuration>
+                <property>
+                    <name>dt</name>
+                    <value>${coord:formatTime(coord:nominalTime(), 'yyyyMMdd')}</value>
+                </property>
+                <property>
+                    <name>BDI</name>
+                    <value>${coord:dataIn('input_bdi')}</value>
+                </property>
+                <property>
+                    <name>auto</name>
+                    <value>${coord:dataIn('input_auto')}</value>
+                </property>
+            </configuration>
+        </workflow>
+    </action>
+</coordinator-app>

@@ -1,0 +1,104 @@
+<coordinator-app name="COORDINATOR_SEGMENT_CPM_PRO" frequency="0 5 * * TUE-SAT"  start="${start}" end="${end}"
+                 timezone="Europe/Paris" xmlns="uri:oozie:coordinator:0.4">
+
+    <!-- Coordinator Control -->
+    <controls>
+        <timeout>-1</timeout>
+        <concurrency>1</concurrency>
+        <execution>FIFO</execution>
+    </controls>
+
+    <datasets>
+        <dataset name="BDI" frequency="${coord:months(1)}" initial-instance="${initialInstance}"
+                 timezone="Europe/Paris">
+            <uri-template>/project/cdn/pcc/hive/project_cdn_pcc_bdi.db/_FLAG/${YEAR}${MONTH}</uri-template>
+            <done-flag>_SUCCESS</done-flag>
+        </dataset>
+
+        <!--<dataset name="BCC" frequency="${coord:days(1)}" initial-instance="${initialInstance}"
+                 timezone="Europe/Paris">
+            <uri-template>/lake/cdn/an336_bcc/tiers/entreprise/${YEAR}${MONTH}${DAY}</uri-template>
+            <done-flag>_SUCCESS</done-flag>
+        </dataset>
+
+        <dataset name="SFM" frequency="${coord:months(1)}" initial-instance="${initialInstance}"
+                 timezone="Europe/Paris">
+            <uri-template>/lake/cdn/an883_sfm/score/${YEAR}${MONTH}${DAY}</uri-template>
+            <done-flag>_SUCCESS</done-flag>
+        </dataset>-->
+
+    </datasets>
+
+
+    <!-- Waiting for input : c'est la partition de la veille-->
+
+    <input-events>
+        <data-in name="input_bdi" dataset="BDI">
+            <instance>${coord:latest(0)}</instance>
+        </data-in>
+       <!-- <data-in name="input_bcc" dataset="BCC">
+            <instance>${coord:current(-1)}</instance>
+        </data-in>
+        <data-in name="input_sfm" dataset="SFM">
+            <instance>${coord:latest(0)}</instance>
+        </data-in>-->
+    </input-events>
+
+    <!-- WorkFlow Definition and sending param : calcul du paramètre -->
+    <action>
+        <workflow>
+            <app-path>/project/cdn/dec/dmp/segments_generique/apps/oozie/workflows/workflow_segment_CPM_PRO.xml</app-path>
+            <configuration>
+
+                <property>
+                    <name>BDI_path</name>
+                    <value>${coord:dataIn('input_bdi')}</value>
+                </property>
+
+                <!--<property>
+                    <name>BCC_path</name>
+                    <value>${coord:dataIn('input_bcc')}</value>
+                </property>
+
+                <property>
+                    <name>SFM_path</name>
+                    <value>${coord:dataIn('input_sfm')}</value>
+                </property>-->
+
+
+                <property>
+                    <name>dt</name>
+                    <value>${coord:formatTime(coord:nominalTime(), 'yyyyMMdd')}</value>
+                </property>
+
+                <property>
+                    <name>dt_octroi</name>
+                    <value>${coord:formatTime(coord:dateOffset(coord:nominalTime(), -27, "DAY"), "yyyy-MM-dd")}</value>
+                </property>
+
+                <property>
+                    <name>dt_bcc</name>
+                    <value>${coord:formatTime(coord:dateOffset(coord:nominalTime(), -1, "DAY"), "yyyy-MM-dd")}</value>
+                </property>
+
+
+               <property>
+                   <name>bdi_flag_path</name>
+                   <value>/project/cdn/pcc/hive/project_cdn_pcc_bdi.db/_FLAG/</value>
+               </property>
+
+                <!-- BDI FLAG path
+               <property>
+                   <name>bcc_flag_path</name>
+                   <value>/lake/cdn/an336_bcc/tiers/entreprise/</value>
+               </property>
+
+               <property>
+                   <name>sfm_flag_path</name>
+                   <value>/lake/cdn/an883_sfm/score/</value>
+               </property> -->
+
+            </configuration>
+        </workflow>
+    </action>
+</coordinator-app>

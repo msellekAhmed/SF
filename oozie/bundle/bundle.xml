@@ -1,0 +1,714 @@
+<bundle-app name="[CDN] SEGMENTS_GENERIQUES_2.0.14 | PRD" xmlns='uri:oozie:bundle:0.2'>
+
+    <controls>
+        <kick-off-time>${kick_off}</kick-off-time>
+    </controls>
+
+    <coordinator name="SEGMENT EA TCO">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_tco.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${segment_DMP2_TCO_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${segment_DMP2_TCO_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${segment_DMP2_TCO_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT CB ROC">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_roc.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${segment_DMP2_ROC_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${segment_DMP2_ROC_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${segment_DMP2_ROC_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT LCP HEBDO">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_lcp_hebdo.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${segment_lcp_hebdo_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${segment_lcp_hebdo_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${segment_lcp_hebdo_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT KR PMJU">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_SPPPKR01_SPPEKR01.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${segment_DMP2_KR_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${segment_DMP2_KR_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${segment_DMP2_KR_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+
+    <coordinator name="SEGMENT VC PPHY">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_vc_pphy.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${segment_VC_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${segment_VC_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${segment_VC_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT VC PMOR">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_vc_pmor.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${segment_VC_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${segment_VC_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${segment_VC_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+
+    <coordinator name="SEGMENT US AUTO">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_usauto.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${segment_USAUTO_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${segment_USAUTO_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${segment_USAUTO_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT PARCOUR PPHY MRA UNICA">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_parcours_client_pphy_mra_unica.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${parcours_client_pphy_mra_unica_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${parcours_client_pphy_mra_unica_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${parcours_client_pphy_mra_unica_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT PARCOUR PPHY MRA ASS">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_parcours_client_pphy_mra_assup.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${parcours_client_pphy_mra_assup_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${parcours_client_pphy_mra_assup_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${parcours_client_pphy_mra_assup_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT PARCOUR PPHY MRA HPC">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_parcours_client_pphy_mra_hpc.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${parcours_client_pphy_mra_hpc_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${parcours_client_pphy_mra_hpc_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${parcours_client_pphy_mra_hpc_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT RELANCE PROPOSITION MRA">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_segment_relance_proposition_mra.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${seg_relance_proposition_mra_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${seg_relance_proposition_mra_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${seg_relance_proposition_mra_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT RELANCE DEVIS MRA">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_segment_relance_devis_mra.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${seg_relance_devis_mra_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${seg_relance_devis_mra_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${seg_relance_devis_mra_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT GDPR">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_segment_gdpr.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${seg_gdpr_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${seg_gdpr_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${seg_gdpr_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT COPERNIC">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_segment_copernic.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${seg_copernic_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${seg_copernic_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${seg_copernic_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT LCP FLASH MRA">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_segment_lcp_flash_mra.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${seg_relance_devis_mra_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${seg_relance_devis_mra_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${seg_relance_devis_mra_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <!--  coordinateur supprimé le 02/03/2021 suite à la demande d'ACLI
+    <coordinator name="SEGMENT LCP FLASH MRA LP">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_segment_lcp_flash_mra_lp.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${seg_relance_devis_mra_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${seg_relance_devis_mra_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${seg_relance_devis_mra_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+ -->
+
+    <coordinator name="SEGMENT US IMMO">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_segment_us_immo.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${segment_USIMMO_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${segment_USIMMO_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${segment_USIMMO_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT VC PIM">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_segment_vc_pim.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${segment_USPIM_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${segment_USPIM_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${segment_USPIM_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT LOAD PMOR IMG">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_img_segment_pmor.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${segment_USPMOR_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${segment_USPMOR_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${segment_USPMOR_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT LOAD PPHY IMG">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_img_segment_pphy.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${segment_USPPHY_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${segment_USPPHY_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${segment_USPPHY_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT VPASS">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_pcc_vpass.xml</app-path>
+        <configuration>
+            <property>
+                <name>initialInstance</name>
+                <value>${pcc_vpass_init}</value>
+            </property>
+            <property>
+                <name>start</name>
+                <value>${pcc_vpass_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${pcc_vpass_end}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT SPPBEX01">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_SPPBEX01.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${segment_DMP_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${segment_DMP_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${segment_DMP_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT SPPBEX02">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_SPPBEX02.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${segment_DMP_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${segment_DMP_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${segment_DMP_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT SPPBEX03">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_SPPBEX03.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${segment_DMP_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${segment_DMP_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${segment_DMP_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT SPPBEX04">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_SPPBEX04.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${segment_DMP_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${segment_DMP_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${segment_DMP_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT SPPBCB01">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_SPPBCB01.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${segment_DMP_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${segment_DMP_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${segment_DMP_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT SPPBCE01">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_SPPBCE01.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${segment_DMP_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${segment_DMP_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${segment_DMP_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT SPPBCE02">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_SPPBCE02.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${segment_DMP_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${segment_DMP_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${segment_DMP_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT SPPBCE03">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_SPPBCE03.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${segment_DMP_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${segment_DMP_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${segment_DMP_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT SPPBCE04">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_SPPBCE04.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${segment_DMP_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${segment_DMP_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${segment_DMP_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="ID_TIE_MKT">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_ID_TIE_MKT.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${ID_TIE_MKT_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${ID_TIE_MKT_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${ID_TIE_MKT_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT SPPBGI01">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_SPPBGI01.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${segment_SPPBGI01_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${segment_SPPBGI01_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${segment_SPPBGI01_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT SPPBPA01">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_SPPBPA01.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${segment_SPPBPA01_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${segment_SPPBPA01_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${segment_SPPBPA01_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="Segment_Eu_Consent">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_EU_Consent.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${segment_eu_consent_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${segment_eu_consent_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${segment_eu_consent_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT PIM">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_segment_pim.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${segment_PIM_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${segment_PIM_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${segment_PIM_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT BULLE DE COM MRH">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_segment_mrh_bulle_com.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${segment_MRH_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${segment_MRH_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${segment_MRH_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT CB VISA">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_segment_visa_bulle_com.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${segment_CB_VISA_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${segment_CB_VISA_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${segment_CB_VISA_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+    <coordinator name="SEGMENT CPM ENT">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_segment_CPM_ENT.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${segment_CPM_ENT_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${segment_CPM_ENT_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${segment_CPM_ENT_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+
+    <coordinator name="SEGMENT CPM PRO">
+        <app-path>${MAVEN_OOZIE_DIR}/coordinators/coordinator_segment_CPM_PRO.xml</app-path>
+        <configuration>
+            <property>
+                <name>start</name>
+                <value>${segment_CPM_PRO_start}</value>
+            </property>
+            <property>
+                <name>end</name>
+                <value>${segment_CPM_PRO_end}</value>
+            </property>
+            <property>
+                <name>initialInstance</name>
+                <value>${segment_CPM_PRO_init}</value>
+            </property>
+        </configuration>
+    </coordinator>
+
+</bundle-app>

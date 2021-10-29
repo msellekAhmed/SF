@@ -1,0 +1,83 @@
+<assembly>
+
+    <id>bin</id>
+
+    <formats>
+        <format>zip</format>
+    </formats>
+
+    <baseDirectory>${project.artifactId}-${project.version}</baseDirectory>
+
+    <fileSets>
+        <fileSet>
+            <directory>${basedir}/src/main/resources</directory>
+            <outputDirectory>lib</outputDirectory>
+            <includes>
+                <include>libhadoop.so</include>
+            </includes>
+        </fileSet>
+
+        <fileSet>
+            <directory>${project.build.directory}/classes</directory>
+            <outputDirectory>lib</outputDirectory>
+            <includes>
+                <include>hive-site.xml</include>
+                <include>*.conf</include>
+                <include>*.sh</include>
+            </includes>
+        </fileSet>
+
+        <fileSet>
+            <directory>${project.build.directory}</directory>
+            <outputDirectory>lib</outputDirectory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/src/main/bash</directory>
+            <outputDirectory>lib</outputDirectory>
+            <includes>
+                <include>start.sh</include>
+            </includes>
+            <excludes>
+                <exclude>deploy-bin.sh</exclude>
+                <exclude>script_conversion_xlsx_csv.sh</exclude>
+            </excludes>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/src/main/oozie/coordinator</directory>
+            <outputDirectory>apps/oozie/coordinator</outputDirectory>
+            <lineEnding>unix</lineEnding>
+            <filtered>true</filtered>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/src/main/oozie/workflow</directory>
+            <outputDirectory>apps/oozie/workflow</outputDirectory>
+            <lineEnding>unix</lineEnding>
+            <filtered>true</filtered>
+        </fileSet>
+
+    </fileSets>
+
+    <files>
+
+        <file>
+            <source>src/main/bash/deploy-bin.sh</source>
+            <outputDirectory></outputDirectory>
+            <destName>deploy.sh</destName>
+            <filtered>true</filtered>
+            <lineEnding>unix</lineEnding>
+        </file>
+
+        <file>
+            <source>README.md</source>
+            <outputDirectory></outputDirectory>
+            <destName>README.md</destName>
+            <lineEnding>unix</lineEnding>
+        </file>
+    </files>
+</assembly>

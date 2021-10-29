@@ -1,0 +1,105 @@
+<workflow-app name="PCC : VPASS enrollements of partition :  ${dt}" xmlns="uri:oozie:workflow:0.5">
+
+    <!-- Definition global -->
+    <global>
+        <job-tracker>yarn-cluster</job-tracker>
+        <name-node>hdfs://phadcluster01</name-node>
+        <configuration>
+            <property>
+                <name>hive.execution.engine</name>
+                <value>tez</value>
+            </property>
+            <property>
+                <name>tez.queue.name</name>
+                <value>PCCP</value>
+            </property>
+            <property>
+                <name>mapreduce.job.queuename</name>
+                <value>PCCP</value>
+            </property>
+            <property>
+                <name>oozie.launcher.mapred.job.queue.name</name>
+                <value>OOZIE_LAUNCHER</value>
+            </property>
+            <property>
+                <name>hive.tez.input.format</name>
+                <value>org.apache.hadoop.hive.ql.io.HiveInputFormat</value>
+            </property>
+        </configuration>
+    </global>
+
+    <!-- Permissions Definition -->
+    <credentials>
+        <credential name='hive_cred' type='hcat'>
+            <property>
+                <name>hcat.metastore.uri</name>
+                <value>thrift://phadlx57.haas.socgen:9083,thrift://phadlx58.haas.socgen:9083</value>
+            </property>
+            <property>
+                <name>hcat.metastore.principal</name>
+                <value>hive/_HOST@PHAD</value>
+            </property>
+        </credential>
+    </credentials>
+
+    <start to="LOAD_TMP"/>
+
+    <!-- Load data to ORC Format -->
+    <action name="LOAD_TMP" cred="hive_cred">
+        <hive xmlns="uri:oozie:hive-action:0.5">
+            <script>${MAVEN_HQL_DIR}/load_table_tmp_pphy_pm.hql</script>
+            <param>dtBDI=${replaceAll(dtBDI, "/project/cdn/pcc/hive/project_cdn_pcc_bdi.db/_FLAG/","")}</param>
+            <param>dt=${dt}</param>
+        </hive>
+        <ok to="LOAD_SEGMENTS"/>
+        <error to="kill"/>
+    </action>
+
+    <action name="LOAD_SEGMENTS" cred="hive_cred">
+        <hive xmlns="uri:oozie:hive-action:0.5">
+            <script>${MAVEN_HQL_DIR}/load_table_segments_vpass.hql</script>
+            <param>dt=${dt}</param>
+        </hive>
+        <ok to="READY"/>
+        <error to="kill"/>
+    </action>
+
+
+    <!-- Create _READY FLAG -->
+    <action name="READY">
+        <fs>
+            <touchz path="/project/cdn/dec/dmp/hive/PROJECT_CDN_DEC_DMP.db/segment_dmp/dt=${dt}/id_segment=SPPBVP01/_READY"/>
+            <touchz path="/project/cdn/dec/dmp/hive/PROJECT_CDN_DEC_DMP.db/segment_dmp/dt=${dt}/id_segment=SPPPVP01/_READY"/>
+        </fs>
+        <ok to="LOAD_PPHY"/>
+        <error to="kill"/>
+    </action>
+
+
+    <action name="LOAD_PPHY" cred="hive_cred">
+        <hive xmlns="uri:oozie:hive-action:0.5">
+            <script>${MAVEN_HQL_DIR}/load_table_pphy_vpass.hql</script>
+            <param>dtBDI=${replaceAll(dtBDI,"/project/cdn/pcc/hive/project_cdn_pcc_bdi.db/_FLAG/","")}</param>
+        </hive>
+        <ok to="LOAD_PMOR"/>
+        <error to="kill"/>
+    </action>
+
+
+    <action name="LOAD_PMOR" cred="hive_cred">
+        <hive xmlns="uri:oozie:hive-action:0.5">
+            <script>${MAVEN_HQL_DIR}/load_table_pm_vpass.hql</script>
+            <param>dtBDI=${replaceAll(dtBDI,"/project/cdn/pcc/hive/project_cdn_pcc_bdi.db/_FLAG/","")}</param>
+        </hive>
+        <ok to="end"/>
+        <error to="kill"/>
+    </action>
+
+
+    <kill name="kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <end name="end"/>
+
+</workflow-app>

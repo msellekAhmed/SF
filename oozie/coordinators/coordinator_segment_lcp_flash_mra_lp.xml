@@ -1,0 +1,44 @@
+<coordinator-app name="COORDINATOR_SEGMENT_LCP_FLASH_MRA_LP" frequency="${coord:days(1)}" start="${start}" end="${end}"
+                 timezone="Europe/Paris" xmlns="uri:oozie:coordinator:0.4">
+
+    <!-- Coordinator Control -->
+    <controls>
+        <timeout>-1</timeout>
+        <concurrency>1</concurrency>
+        <execution>FIFO</execution>
+    </controls>
+
+
+    <!-- DataSets Definition -->
+    <datasets>
+        <dataset name="raw_logs" frequency="${coord:days(1)}" initial-instance="${initialInstance}"
+                 timezone="Europe/Paris">
+            <uri-template>/project/cdn/pcc/hive/project_cdn_pcc_hpc.db/hpc/dt=${YEAR}${MONTH}${DAY}</uri-template>
+            <done-flag>_SUCCESS</done-flag>
+        </dataset>
+    </datasets>
+
+    <!-- Waiting for input -->
+    <input-events>
+        <data-in name="input" dataset="raw_logs">
+            <instance>${coord:current(0)}</instance>
+        </data-in>
+    </input-events>
+
+    <!-- WorkFlow Definition and sending param -->
+    <action>
+        <workflow>
+            <app-path>${MAVEN_OOZIE_DIR}/workflows/workflow_segment_lcp_flash_mra_lp.xml</app-path>
+            <configuration>
+                <property>
+                    <name>raw_logs</name>
+                    <value>${coord:dataIn('input')}</value>
+                </property>
+                <property>
+                    <name>dt</name>
+                    <value>${coord:formatTime(coord:nominalTime(), "yyyyMMdd")}</value>
+                </property>
+            </configuration>
+        </workflow>
+    </action>
+</coordinator-app>

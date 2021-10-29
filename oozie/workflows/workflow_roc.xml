@@ -1,0 +1,174 @@
+<workflow-app name="WORKFLOW SEGMENT CB ROC" xmlns="uri:oozie:workflow:0.5">
+
+    <!-- Definition global -->
+    <global>
+        <job-tracker>yarn-cluster</job-tracker>
+        <name-node>${MAVEN_NAMENODE}</name-node>
+        <configuration>
+            <property>
+                <name>hive.execution.engine</name>
+                <value>${MAVEN_HIVE_EXECUTION_ENGINE}</value>
+            </property>
+            <property>
+                <name>tez.queue.name</name>
+                <value>${MAVEN_TEZ_QUEUE_NAME}</value>
+            </property>
+            <property>
+                <name>mapreduce.job.queuename</name>
+                <value>${MAVEN_MR_QUEUE_NAME}</value>
+            </property>
+            <property>
+                <name>oozie.launcher.mapred.job.queue.name</name>
+                <value>${MAVEN_OOZIE_QUEUE_NAME}</value>
+            </property>
+            <property>
+                <name>mapreduce.cluster.acls.enabled</name>
+                <value>${MAVEN_CLUSTER_ACL_ENABLED}</value>
+            </property>
+            <property>
+                <name>mapreduce.job.acl-view-job</name>
+                <value>*</value>
+            </property>
+            <property>
+                <name>hive.tez.input.format</name>
+                <value>${MAVEN_TEZ_INPUT_FORMAT}</value>
+            </property>
+            <property>
+                <name>hive.compute.query.using.stats</name>
+                <value>${MAVEN_HIVE_COMPUTE_QUERY_STAT}</value>
+            </property>
+            <property>
+                <name>hive.stats.fetch.column.stats</name>
+                <value>${MAVEN_HIVE_FETCH_COLUMN_STAT}</value>
+            </property>
+            <property>
+                <name>hive.stats.fetch.partition.stats</name>
+                <value>${MAVEN_HIVE_FETCH_PARTITION_STAT}</value>
+            </property>
+            <property>
+                <name>hive.stats.autogather</name>
+                <value>${MAVEN_HIVE_STAT_AUTOGATHER}</value>
+            </property>
+            <property>
+                <name>hive.optimize.skewjoin</name>
+                <value>${MAVEN_SKEW_JOIN_ENABLED}</value>
+            </property>
+            <property>
+                <name>hive.skewjoin.key</name>
+                <value>${MAVEN_SKEW_JOIN_KEY}</value>
+            </property>
+            <property>
+                <name>hive.exec.parallel</name>
+                <value>${MAVEN_HIVE_PARALLEL_EXEC_ENABLED}</value>
+            </property>
+            <property>
+                <name>hive.exec.parallel.thread.number</name>
+                <value>${MAVEN_HIVE_PARALLEL_EXEC_THREAD}</value>
+            </property>
+            <property>
+                <name>hive.vectorized.execution.enabled</name>
+                <value>${MAVEN_HIVE_VECTOR_ENABLED}</value>
+            </property>
+            <property>
+                <name>hive.vectorized.execution.reduce.enabled</name>
+                <value>${MAVEN_HIVE_VECTOR_ENABLED}</value>
+            </property>
+            <property>
+                <name>hive.vectorized.execution.reduce.groupby.enabled</name>
+                <value>${MAVEN_HIVE_VECTOR_ENABLED}</value>
+            </property>
+            <property>
+                <name>hive.support.concurrency</name>
+                <value>${MAVEN_HIVE_SUPPORT_CONCURRENCY}</value>
+            </property>
+            <property>
+                <name>hive.auto.convert.join</name>
+                <value>${MAVEN_HIVE_AUTO_MAP_JOIN}</value>
+            </property>
+        </configuration>
+    </global>
+
+    <!-- Permissions Definition -->
+    <credentials>
+        <credential name='hive_cred' type='hcat'>
+            <property>
+                <name>hcat.metastore.uri</name>
+                <value>${MAVEN_HCAT_METASTORE_URI}</value>
+            </property>
+            <property>
+                <name>hcat.metastore.principal</name>
+                <value>${MAVEN_HCAT_METASTORE_PRINCIPAL}</value>
+            </property>
+        </credential>
+    </credentials>
+
+    <!-- Start the WorkFlow -->
+    <start to="LOAD_TRANSACTIONS_ROC"/>
+
+    <!-- LOAD TRANSACTIONS ROC-->
+        <action name="LOAD_TRANSACTIONS_ROC" cred="hive_cred">
+        <hive xmlns="uri:oozie:hive-action:0.5">
+            <script>${MAVEN_HQL_DIR}/load_roc.hql</script>
+			<param>dt_1=${dt_1}</param>
+			<param>mois_bdi=${replaceAll(BDI, "/project/cdn/pcc/hive/project_cdn_pcc_bdi.db/_FLAG/","")}</param>
+        </hive>
+        <ok to="CALCUL_CB"/>
+        <error to="kill"/>
+    </action>
+
+    <!-- CALCUL CB-->
+        <action name="CALCUL_CB" cred="hive_cred">
+        <hive xmlns="uri:oozie:hive-action:0.5">
+            <script>${MAVEN_HQL_DIR}/load_cb.hql</script>
+			<param>dt_1=${dt_1}</param>
+			<param>dt_roc=${replaceAll(ROC_TRANSACTIONS, "/project/cdn/pcc/hive/project_cdn_pcc_transactions.db/a1645_roc_cdn/dt=","")}</param>
+        </hive>
+        <ok to="LOAD_CB_SEGMENTS_DMP"/>
+        <error to="kill"/>
+    </action>
+
+    <!-- LOAD SEGMENTS DMP-->
+    <action name="LOAD_CB_SEGMENTS_DMP" cred="hive_cred">
+        <hive xmlns="uri:oozie:hive-action:0.5">
+            <script>${MAVEN_HQL_DIR}/load_cb_segment_dmp.hql</script>
+			<param>dt=${dt}</param>
+			<param>dt_1=${dt_1}</param>
+			<param>dt_3s=${dt_3s}</param>
+			<param>dt_roc=${replaceAll(ROC_TRANSACTIONS, "/project/cdn/pcc/hive/project_cdn_pcc_transactions.db/a1645_roc_cdn/dt=","")}</param>
+        </hive>
+        <ok to="READY"/>
+        <error to="kill"/>
+    </action>
+	
+    <!-- Create _READY FLAG -->
+    <action name="READY">
+        <fs>
+            <touchz path="${MAVEN_DEC_DMP_SEG_DB_DIR}/dt=${dt}/id_segment=SPPBCB02/_READY" />
+			<touchz path="${MAVEN_DEC_DMP_SEG_DB_DIR}/dt=${dt}/id_segment=SPPBCB03/_READY" />
+			<touchz path="${MAVEN_DEC_DMP_SEG_DB_DIR}/dt=${dt}/id_segment=SPPBCB04/_READY" />
+        </fs>
+        <ok to="LOAD_CB_SEGMENTS_DMP_HISTO"/>
+        <error to="kill"/>
+    </action>
+	
+    <!-- LOAD SEGMENTS DMP-->
+    <action name="LOAD_CB_SEGMENTS_DMP_HISTO" cred="hive_cred">
+        <hive xmlns="uri:oozie:hive-action:0.5">
+            <script>${MAVEN_HQL_DIR}/load_cb_segment_dmp_histo.hql</script>
+			<param>dt=${dt}</param>
+        </hive>
+        <ok to="end"/>
+        <error to="kill"/>
+    </action>
+	
+    <kill name="kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <end name="end"/>
+</workflow-app>
+
+
+
+
+

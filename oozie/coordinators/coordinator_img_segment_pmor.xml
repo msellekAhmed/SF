@@ -1,0 +1,52 @@
+<coordinator-app name="SEGMENT_LOAD_PMOR" frequency="0 5 * * WED-SAT" start="${start}" end="${end}"
+                 timezone="Europe/Paris" xmlns="uri:oozie:coordinator:0.4">
+
+    <!-- Coordinator Control -->
+    <controls>
+        <timeout>-1</timeout>
+        <concurrency>1</concurrency>
+        <execution>FIFO</execution>
+    </controls>
+
+    <datasets>
+        <dataset name="NOTLAB" frequency="${coord:days(1)}" initial-instance="${initialInstance}"
+                 timezone="Europe/Paris">
+            <uri-template>/project/cdn/imi/bcc/hive/project_cdn_bcc_fra.db/an938_brt_notlab/dt=${YEAR}${MONTH}${DAY}</uri-template>
+            <done-flag>type_tiers=PM</done-flag>
+        </dataset>
+    </datasets>
+
+
+    <!-- Waiting for input -->
+
+    <input-events>
+        <data-in name="input_notlab" dataset="NOTLAB">
+            <instance>${coord:current(-1)}</instance>
+        </data-in>
+    </input-events>
+
+    <!-- WorkFlow Definition and sending param : calcul du paramètre -->
+    <action>
+        <workflow>
+            <app-path>${MAVEN_OOZIE_DIR}/workflows/workflow_pmor_img.xml</app-path>
+            <configuration>
+
+                <property>
+                    <name>dt_1</name>
+                    <value>${coord:formatTime(coord:dateOffset(coord:nominalTime(), -1, "DAY"), "yyyyMMdd")}</value>
+                </property>
+
+                <property>
+                    <name>dt</name>
+                    <value>${coord:formatTime(coord:nominalTime(), 'yyyyMMdd')}</value>
+                </property>
+
+                <property>
+                    <name>NOTLAB</name>
+                    <value>${coord:dataIn('input_notlab')}</value>
+                </property>
+
+            </configuration>
+        </workflow>
+    </action>
+</coordinator-app>

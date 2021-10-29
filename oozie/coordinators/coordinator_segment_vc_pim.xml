@@ -1,0 +1,65 @@
+<coordinator-app name="COORDINATOR SEGMENT_VC_PIM" frequency="0 5 * * MON-FRI" start="${start}" end="${end}"
+                 timezone="Europe/Paris" xmlns="uri:oozie:coordinator:0.4">
+
+    <!-- Coordinator Control -->
+    <controls>
+        <timeout>-1</timeout>
+        <concurrency>1</concurrency>
+        <execution>FIFO</execution>
+    </controls>
+
+    <datasets>
+
+        <dataset name="BDI" frequency="${coord:months(1)}" initial-instance="${initialInstance}"
+                 timezone="Europe/Paris">
+            <uri-template>${MAVEN_BDI_DB_DIR}/_FLAG/${YEAR}${MONTH}</uri-template>
+            <done-flag>_SUCCESS</done-flag>
+        </dataset>
+
+    </datasets>
+
+
+    <!-- Waiting for input -->
+
+    <input-events>
+
+        <data-in name="input_bdi" dataset="BDI">
+            <instance>${coord:current(-2)}</instance>
+        </data-in>
+
+
+    </input-events>
+
+    <!-- WorkFlow Definition and sending param : calcul du paramètre -->
+    <action>
+        <workflow>
+            <app-path>${MAVEN_OOZIE_DIR}/workflows/workflow_vc_pim.xml</app-path>
+            <configuration>
+
+                <property>
+                    <name>dt</name>
+                    <value>${coord:formatTime(coord:nominalTime(), 'yyyyMMdd')}</value>
+                </property>
+                <property>
+                    <name>BDI</name>
+                    <value>${coord:dataIn('input_bdi')}</value>
+                </property>
+                <property>
+                    <name>day</name>
+                    <value>${coord:formatTime(coord:nominalTime(), 'E')}</value>
+                </property>
+
+                <property>
+                    <name>dt_pret</name>
+                    <value>${coord:formatTime(coord:dateOffset(coord:nominalTime(), -31, "DAY"), "yyyy-MM-dd")}</value>
+                </property>
+
+                <property>
+                    <name>dt_pret_fri</name>
+                    <value>${coord:formatTime(coord:dateOffset(coord:nominalTime(), -3, "DAY"), "yyyy-MM-dd")}</value>
+                </property>
+
+            </configuration>
+        </workflow>
+    </action>
+</coordinator-app>

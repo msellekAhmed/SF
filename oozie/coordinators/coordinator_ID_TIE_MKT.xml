@@ -1,0 +1,61 @@
+<coordinator-app name="ID_TIE_MKT" frequency="${coord:months(1)}" start="${start}" end="${end}"
+
+                 timezone="Europe/Paris" xmlns="uri:oozie:coordinator:0.4">
+
+    <!-- Coordinator Control -->
+    <controls>
+        <timeout>-1</timeout>
+        <concurrency>1</concurrency>
+        <execution>FIFO</execution>
+    </controls>
+
+    <!-- DataSets Definition -->
+    <datasets>
+        <dataset name="TB_CNT" frequency="${coord:months(1)}" initial-instance="${initialInstance}"
+                 timezone="Europe/Paris">
+            <uri-template>${MAVEN_BDI_DB_DIR}/_FLAG/${YEAR}${MONTH}</uri-template>
+            <done-flag>_SUCCESS</done-flag>
+        </dataset>
+
+        <dataset name="TA_TIE_TITU_CNT" frequency="${coord:months(1)}" initial-instance="${initialInstance}"
+                 timezone="Europe/Paris">
+            <uri-template>${MAVEN_BDI_DB_DIR}/_FLAG/${YEAR}${MONTH}</uri-template>
+            <done-flag>_SUCCESS</done-flag>
+        </dataset>
+    </datasets>
+
+    <!-- Waiting for input -->
+    <input-events>
+        <data-in name="input_BDI1" dataset="TB_CNT">
+            <instance>${coord:latest(0)}</instance>
+        </data-in>
+
+        <data-in name="input_BDI2" dataset="TA_TIE_TITU_CNT">
+            <instance>${coord:latest(0)}</instance>
+        </data-in>
+    </input-events>
+
+    <!-- WorkFlow Definition and sending param : calcul des paramètres -->
+    <action>
+        <workflow>
+            <app-path>${MAVEN_OOZIE_DIR}/workflows/workflow_ID_TIE_MKT.xml</app-path>
+            <configuration>
+                <property>
+                    <name>TB_CNT</name>
+                    <value>${coord:dataIn('input_BDI1')}</value>
+                </property>
+                <property>
+                    <name>TA_TIE_TITU_CNT</name>
+                    <value>${coord:dataIn('input_BDI2')}</value>
+                </property>
+
+                <property>
+                    <name>dt</name>
+                    <value>${coord:formatTime(coord:dateOffset(coord:nominalTime(), -1, "MONTH"), "yyyyMM")}</value>
+                </property>
+
+            </configuration>
+        </workflow>
+    </action>
+</coordinator-app>
+

@@ -1,0 +1,69 @@
+<coordinator-app name="COORDINATOR SEGMENT_US_IMMO" frequency="0 5 * * TUE-SAT" start="${start}" end="${end}"
+                 timezone="Europe/Paris" xmlns="uri:oozie:coordinator:0.4">
+
+    <!-- Coordinator Control -->
+    <controls>
+        <timeout>-1</timeout>
+        <concurrency>1</concurrency>
+        <execution>FIFO</execution>
+    </controls>
+
+    <datasets>
+
+        <dataset name="BDI" frequency="${coord:months(1)}" initial-instance="${initialInstance}"
+                 timezone="Europe/Paris">
+            <uri-template>/project/cdn/pcc/hive/project_cdn_pcc_bdi.db/_FLAG/${YEAR}${MONTH}</uri-template>
+            <done-flag>_SUCCESS</done-flag>
+        </dataset>
+
+        <dataset name="us_immo" frequency="${coord:days(1)}" initial-instance="${initialInstance}"
+                 timezone="Europe/Paris">
+            <uri-template>/srv/an218_pre/ti_pre_stock/dt=${YEAR}-${MONTH}-${DAY}</uri-template>
+            <done-flag>000000_0</done-flag>
+        </dataset>
+
+    </datasets>
+
+
+    <!-- Waiting for input : on veut la partition de la veille -->
+
+    <input-events>
+
+        <data-in name="input_bdi" dataset="BDI">
+            <instance>${coord:current(-2)}</instance>
+        </data-in>
+        <data-in name="input_immo" dataset="us_immo">
+            <instance>${coord:current(-1)}</instance>
+        </data-in>
+
+    </input-events>
+
+    <!-- WorkFlow Definition and sending param : calcul du paramètre -->
+    <action>
+        <workflow>
+            <app-path>${MAVEN_OOZIE_DIR}/workflows/workflow_usimmo.xml</app-path>
+            <configuration>
+                <property>
+                    <name>dt</name>
+                    <value>${coord:formatTime(coord:nominalTime(), 'yyyyMMdd')}</value>
+                </property>
+                <property>
+                    <name>BDI</name>
+                    <value>${coord:dataIn('input_bdi')}</value>
+                </property>
+                <property>
+                    <name>immo</name>
+                    <value>${coord:dataIn('input_immo')}</value>
+                </property>
+                <property>
+                    <name>dt_pret</name>
+                    <value>${coord:formatTime(coord:dateOffset(coord:nominalTime(), -1, "DAY"), "yyyy-MM-dd")}</value>
+                </property>
+                <property>
+                    <name>dt_offre</name>
+                    <value>${coord:formatTime(coord:dateOffset(coord:nominalTime(), -1, "DAY"), "yyyyMMdd")}</value>
+                </property>
+            </configuration>
+        </workflow>
+    </action>
+</coordinator-app>

@@ -1,0 +1,72 @@
+<coordinator-app name="SEGMENT LCP HEBDO" frequency="${coord:days(1)}" start="${start}" end="${end}"
+                 timezone="Europe/Paris" xmlns="uri:oozie:coordinator:0.4">
+    <!-- Coordinator Control -->
+    <controls>
+        <timeout>-1</timeout>
+        <concurrency>1</concurrency>
+        <execution>FIFO</execution>
+    </controls>
+
+    <!-- DataSets Definition : on veut une partition -->
+    <datasets>
+        <dataset name="BDI" frequency="${coord:months(1)}" initial-instance="${initialInstance}"
+                 timezone="Europe/Paris">
+            <uri-template>${MAVEN_BDI_DB_DIR}/_FLAG/${YEAR}${MONTH}</uri-template>
+            <done-flag>_SUCCESS</done-flag>
+        </dataset>
+        <dataset name="TITUL" frequency="${coord:days(1)}" initial-instance="${initialInstance}"
+                 timezone="Europe/Paris">
+            <uri-template>/lake/cdn/an336_bcc/relcom/titulclasouv/${YEAR}${MONTH}${DAY}</uri-template>
+            <done-flag>_SUCCESS</done-flag>
+        </dataset>
+        <dataset name="CONTRAT" frequency="${coord:days(1)}" initial-instance="${initialInstance}"
+                 timezone="Europe/Paris">
+            <uri-template>/lake/cdn/an336_bcc/contrats_actifs/${YEAR}${MONTH}${DAY}</uri-template>
+            <done-flag>_SUCCESS</done-flag>
+        </dataset>
+    </datasets>
+
+    <!-- Waiting for input : on veut la partition de la veille -->
+
+    <input-events>
+        <data-in name="input_bdi" dataset="BDI">
+            <instance>${coord:current(-2)}</instance>
+        </data-in>
+        <data-in name="input_bcc_contrat" dataset="CONTRAT">
+            <instance>${coord:current(-1)}</instance>
+        </data-in>
+        <data-in name="input_titul" dataset="TITUL">
+            <instance>${coord:current(-1)}</instance>
+        </data-in>
+    </input-events>
+
+    <!-- WorkFlow Definition and sending param : calcul du paramètre -->
+    <action>
+        <workflow>
+            <app-path>${MAVEN_OOZIE_DIR}/workflows/workflow_segments_lcp_hebdo.xml</app-path>
+            <configuration>
+                <property>
+                    <name>BDI</name>
+                    <value>${coord:dataIn('input_bdi')}</value>
+                </property>
+                <property>
+                    <name>CONTRAT</name>
+                    <value>${coord:dataIn('input_bcc_contrat')}</value>
+                </property>
+                <property>
+                    <name>TITUL</name>
+                    <value>${coord:dataIn('input_titul')}</value>
+                </property>
+                <property>
+                    <name>dt</name>
+                    <value>${coord:formatTime(coord:nominalTime(), 'yyyyMMdd')}</value>
+                </property>
+                <!-- BDI FLAG path -->
+                <property>
+                    <name>bdi_flag_path</name>
+                    <value>${MAVEN_BDI_DB_DIR}/_FLAG/</value>
+                </property>
+            </configuration>
+        </workflow>
+    </action>
+</coordinator-app>

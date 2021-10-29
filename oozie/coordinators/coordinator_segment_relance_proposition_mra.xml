@@ -1,0 +1,44 @@
+<coordinator-app name="COORDINATOR SEGMENT RELANCE PROPOSITION MRA" frequency="${coord:days(1)}" start="${start}" end="${end}"
+                 timezone="Europe/Paris" xmlns="uri:oozie:coordinator:0.4">
+
+    <!-- Coordinator Control -->
+    <controls>
+        <timeout>-1</timeout>
+        <concurrency>1</concurrency>
+        <execution>FIFO</execution>
+    </controls>
+
+
+    <!-- DataSets Definition -->
+    <datasets>
+        <dataset name="raw_logs" frequency="${coord:days(1)}" initial-instance="${initialInstance}"
+                 timezone="Europe/Paris">
+            <uri-template>${MAVEN_DEC_DMP_DB_DIR}/parcours_client_pphy_mra/dt=${YEAR}${MONTH}${DAY}/source=ASSUP</uri-template>
+            <done-flag>_SUCCESS</done-flag>
+        </dataset>
+    </datasets>
+
+    <!-- Waiting for input -->
+    <input-events>
+        <data-in name="input" dataset="raw_logs">
+            <instance>${coord:current(0)}</instance>
+        </data-in>
+    </input-events>
+
+    <!-- WorkFlow Definition and sending param -->
+    <action>
+        <workflow>
+            <app-path>${MAVEN_OOZIE_DIR}/workflows/workflow_segment_relance_proposition_mra.xml</app-path>
+            <configuration>
+                <property>
+                    <name>raw_logs</name>
+                    <value>${coord:dataIn('input')}</value>
+                </property>
+                <property>
+                    <name>dt</name>
+                    <value>${coord:formatTime(coord:nominalTime(), "yyyyMMdd")}</value>
+                </property>
+            </configuration>
+        </workflow>
+    </action>
+</coordinator-app>

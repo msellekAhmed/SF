@@ -1,0 +1,106 @@
+<workflow-app name="[CDN] DMP PURGE ENGINE ${dt}" xmlns="uri:oozie:workflow:0.5">
+    <!-- Definition des droits d'acces -->
+
+    <!-- Definition global -->
+<global>
+    <job-tracker>yarn-cluster</job-tracker>
+    <name-node>${MAVEN_NAMENODE}</name-node>
+    <configuration>
+        <property>
+            <name>hive.execution.engine</name>
+            <value>${MAVEN_HIVE_EXECUTION_ENGINE}</value>
+        </property>
+        <property>
+            <name>tez.queue.name</name>
+            <value>${MAVEN_TEZ_QUEUE_NAME}</value>
+        </property>
+        <property>
+            <name>mapreduce.job.queuename</name>
+            <value>${MAVEN_MR_QUEUE_NAME}</value>
+        </property>
+        <property>
+            <name>oozie.launcher.mapred.job.queue.name</name>
+            <value>${MAVEN_MR_QUEUE_NAME}</value>
+        </property>
+        <property>
+            <name>oozie.launcher.mapreduce.map.memory.mb</name>
+            <value>9216</value>
+        </property>
+        <property>
+            <name>oozie.launcher.mapreduce.map.java.opts</name>
+            <value>-Xmx6144m</value>
+        </property>
+        <property>
+            <name>oozie.launcher.yarn.app.mapreduce.am.resource.mb</name>
+            <value>768</value>
+        </property>
+        <property>
+            <name>mapred.task.timeout</name>
+            <value>7200000</value>
+        </property>
+        <property>
+            <name>mapreduce.reduce.shuffle.connect.timeout</name>
+            <value>7200000</value>
+        </property>
+        <property>
+            <name>mapreduce.reduce.shuffle.read.timeout</name>
+            <value>7200000</value>
+        </property>
+    </configuration>
+</global>
+
+        <!-- Permissions Definition -->
+<credentials>
+    <credential name='hive_cred' type='hcat'>
+        <property>
+            <name>hive.metastore.kerberos.principal</name>
+            <value>hive/_HOST@PHAD</value>
+        </property>
+        <property>
+            <name>hive.metastore.uris</name>
+            <value>thrift://phadlx57.haas.socgen:9083,thrift://phadlx58.haas.socgen:9083</value>
+        </property>
+    </credential>
+</credentials>
+
+
+    <!-- Start the WorkFlow -->
+    <start to="Process_Desensitization"/>
+
+    <action name="Process_Desensitization" cred="${MAVEN_HIVE_CRED}">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <job-tracker>phadp30.haas.socgen:11000</job-tracker>
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>MOTEUR_DE_PURGE_DMP</name>
+            <class>com.socgen.poc.Anonymise</class>
+            <jar>hdfs://phadcluster01/project/cdn/pcc/dmp/conservation/lib/MOTEUR-CONSERVATION-1.0-with-dependencies.jar</jar>
+            <spark-opts>--executor-memory 3g --num-executors 6 --executor-cores 4 --driver-memory 5g --driver-cores 4 --queue ${MAVEN_TEZ_QUEUE_NAME} --jars hdfs://phadcluster01/project/cdn/pcc/dmp/conservation/lib/bc-fips-1.1.0.jar,hdfs://phadcluster01/project/cdn/pcc/dmp/conservation/lib/bcmail-fips-1.0.0.jar,hdfs://phadcluster01/project/cdn/pcc/dmp/conservation/lib/bcpg-fips-1.0.0.jar,hdfs://phadcluster01/project/cdn/pcc/dmp/conservation/lib/bcpkix-fips-1.0.0.jar spark.driver.extraClassPath="./bc-fips-1.1.0.jar:./bcmail-fips-1.0.0.jar:./bcpg-fips-1.0.0.jar:./bcpkix-fips-1.0.0.jar" spark.executor.extraClassPath="./bc-fips-1.1.0.jar:./bcmail-fips-1.0.0.jar:./bcpg-fips-1.0.0.jar:./bcpkix-fips-1.0.0.jar"</spark-opts>
+            <arg>${dt}</arg>
+            <arg>${dt_bis}</arg>
+            <arg>run</arg>
+            <file>hdfs://phadcluster01/project/cdn/pcc/dmp/conservation/lib/ksc-i-kru-prd-kmip.04052020.jks</file>
+        </spark>
+        <ok to="CreateFlogDone"/>
+        <error to="kill"/>
+    </action>
+
+
+    <!-- Create Flag consent _READY -->
+    <action name="CreateFlogDone" cred="hive_cred">
+        <fs>
+            <touchz path="${MAVEN_DECLENCHEUR_PATH}/${dt_bis}/_DONE" />
+        </fs>
+        <ok to="end"/>
+        <error to="kill"/>
+    </action>
+
+
+    <!-- En cas d'echec -->
+    <kill name="kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <end name="end"/>
+
+</workflow-app>

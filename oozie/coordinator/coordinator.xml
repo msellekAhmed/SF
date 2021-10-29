@@ -1,0 +1,49 @@
+<coordinator-app name="${MAVEN_COORDINATOR_NAME}" frequency="${MAVEN_FREQUENCY}" start="${start}"
+                 end="${end}"
+                 timezone="${MAVEN_TIMEZONE}" xmlns="uri:oozie:coordinator:0.4">
+
+    <!-- Coordinator Control -->
+    <controls>
+        <timeout>${MAVEN_TIMEOUT}</timeout>
+        <concurrency>${MAVEN_CONCURRENCY}</concurrency>
+        <execution>${MAVEN_EXECUTION}</execution>
+    </controls>
+
+    <!-- DataSets Definition -->
+    <datasets>
+        <dataset name="raw_logs" frequency="${coord:months(1)}" initial-instance="${initialInstance}"
+                 timezone="${MAVEN_TIMEZONE}">
+            <uri-template>${MAVEN_DECLENCHEUR_PATH}/${YEAR}${MONTH}</uri-template>
+            <done-flag>_SUCCESS</done-flag>
+        </dataset>
+    </datasets>
+
+    <!-- Waiting for input -->
+    <input-events>
+        <data-in name="input" dataset="raw_logs">
+            <instance>${coord:current(0)}</instance>
+        </data-in>
+    </input-events>
+
+    <!-- WorkFlow Definition and sending param -->
+    <action>
+        <workflow>
+            <app-path>${MAVEN_APP_DIR}/oozie/workflow/workflow.xml</app-path>
+            <configuration>
+                <property>
+                    <name>raw_logs</name>
+                    <value>${coord:dataIn('input')}</value>
+                </property>
+                <property>
+                    <name>dt</name>
+                    <value>${coord:formatTime(coord:nominalTime(), "yyyyMMdd")}</value>
+                </property>
+                <property>
+                    <name>dt_bis</name>
+                    <value>${coord:formatTime(coord:nominalTime(), "yyyyMM")}</value>
+                </property>
+            </configuration>
+        </workflow>
+    </action>
+
+</coordinator-app>

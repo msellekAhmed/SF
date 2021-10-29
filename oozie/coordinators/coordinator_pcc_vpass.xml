@@ -1,0 +1,53 @@
+<coordinator-app name="COORDINATOR PCC VPASS" frequency="${coord:days(1)}" start="${start}" end="${end}"
+                 timezone="Europe/Paris" xmlns="uri:oozie:coordinator:0.4">
+
+    <!-- Coordinator Control -->
+    <controls>
+        <timeout>-1</timeout>
+        <concurrency>1</concurrency>
+        <execution>FIFO</execution>
+    </controls>
+
+    <!-- DataSets Definition -->
+    <datasets>
+        <dataset name="raw_logs" frequency="${coord:days(1)}" initial-instance="${initialInstance}"
+                 timezone="Europe/Paris">
+            <uri-template>${MAVEN_SDC_DB_DIR}/sdc_sst/dt=${YEAR}${MONTH}${DAY}</uri-template>
+            <done-flag>_SUCCESS</done-flag>
+        </dataset>
+        <dataset name="BDI" frequency="${coord:days(1)}" initial-instance="${initialInstance}"
+                 timezone="Europe/Paris">
+            <uri-template>${MAVEN_BDI_DB_DIR}/_FLAG/${YEAR}${MONTH}</uri-template>
+            <done-flag>_SUCCESS</done-flag>
+        </dataset>
+    </datasets>
+
+    <!-- Waiting for input -->
+    <input-events>
+        <data-in name="input" dataset="raw_logs">
+            <instance>${coord:current(-1)}</instance>
+        </data-in>
+        <data-in name="input_BDI" dataset="BDI">
+            <instance>${coord:latest(0)}</instance>
+        </data-in>
+    </input-events>
+
+    <!-- WorkFlow Definition and sending param -->
+    <action>
+        <workflow>
+            <app-path>${MAVEN_OOZIE_DIR}/workflows/workflow_pcc_vpass.xml</app-path>
+            <configuration>
+                <property>
+                    <name>dtBDI</name>
+                    <value>${coord:dataIn('input_BDI')}</value>
+                </property>
+
+                <property>
+                    <name>dt</name>
+                    <value>${coord:formatTime(coord:nominalTime(), "yyyyMMdd")}</value>
+                </property>
+            </configuration>
+        </workflow>
+    </action>
+
+</coordinator-app>

@@ -1,0 +1,28 @@
+<configuration>
+
+    <property>
+        <name>hive.metastore.execute.setugi</name>
+        <value>true</value>
+    </property>
+
+    <property>
+        <name>hive.metastore.kerberos.keytab.file</name>
+        <value>${MAVEN_HIVE_KERBEROS_FILE}</value>
+    </property>
+
+    <property>
+        <name>hive.metastore.kerberos.principal</name>
+        <value>${MAVEN_HIVE_KERBEROS_PRINCIPAL}</value>
+    </property>
+
+    <property>
+        <name>hive.metastore.sasl.enabled</name>
+        <value>true</value>
+    </property>
+
+    <property>
+        <name>hive.metastore.uris</name>
+        <value>${MAVEN_HIVE_METASTORE_URI}</value>
+    </property>
+
+</configuration>
